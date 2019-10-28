@@ -12,26 +12,18 @@ final class DoctrineUnitOfWork implements UnitOfWorkInterface
      */
     private $entityManager;
 
-    /**
-     * @var int
-     */
-    private $transactionsSaved;
-
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->transactionsSaved = 0;
-    }
-
-    public function save(): void
-    {
-        ++$this->transactionsSaved;
     }
 
     public function commit(): void
     {
-        if ($this->transactionsSaved > 0) {
-            $this->entityManager->flush();
-        }
+        $this->entityManager->flush();
+    }
+
+    public function commitTransactional(callable $operation)
+    {
+        return $this->entityManager->transactional($operation);
     }
 }
